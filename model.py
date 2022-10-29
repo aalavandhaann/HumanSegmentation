@@ -89,7 +89,8 @@ def deeplabv3_plus(shape: tuple) -> tf.keras.models.Model:
         "include_top" implies if we need a classifer but not necessary since this is a segmentation task
 
     """
-    encoder = tf.keras.applications.ResNet50(weights='imagenet', include_top=False, input_tensor=inputs)
+    # encoder = tf.keras.applications.ResNet50(weights='imagenet', include_top=False, input_tensor=inputs)
+    encoder = tf.keras.applications.ResNet50(weights='./resnet-weights/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5', include_top=False, input_tensor=inputs)
 
     image_features = encoder.get_layer("conv4_block6_out").output
 
