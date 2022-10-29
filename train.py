@@ -5,8 +5,11 @@ import pathlib
 import numpy as np
 import cv2
 import sklearn
+print('LOADED NUMPY, CV2, SKLEARN')
+print('NOW ATTEMPTING TO LOAD TENSORFLOW')
 import tensorflow as tf
-
+print(tf.config.list_physical_devices('GPU'))
+print('FINISHED LOADING TENSORFLOW MODULE')
 
 from model import deeplabv3_plus
 from dataprocessing import load_data
@@ -67,23 +70,33 @@ if __name__ == "__main__":
     training_path = pathlib.Path(os.path.join(dataset_path, 'train'))
     testing_path = pathlib.Path(os.path.join(dataset_path, 'test'))
 
+    print("LOAD THE TRAINING IMAGES AND MASKS")
     train_images_collection, train_masks_collection = load_data(training_path, do_splitting=False, ext1='*.png', as_str=True)
+    print("SHUFFLE THE TRAINING IMAGES AND MASKS")
     train_images_collection, train_masks_collection = shuffling(train_images_collection, train_masks_collection)
+    print("LOAD THE TESTING IMAGES AND MASKS")
     test_images_collection, test_masks_collection = load_data(testing_path, do_splitting=False, ext1='*.png', as_str=True)
 
     print(f"Train <#images, #masks>: <{len(train_images_collection)}, {len(train_masks_collection)}>")
     print(f"Test <#images, #masks>: <{len(test_images_collection)}, {len(test_masks_collection)}>")
 
+    print('CREATE THE TRAINING DATASET TENSORS')
     train_dataset = tf_dataset(train_images_collection, train_masks_collection, batch = batch_size)
+    print('CREATE THE TESTING DATASET TENSORS')
     test_dataset = tf_dataset(test_images_collection, test_masks_collection, batch = batch_size)
 
+    print('INITIALIZE THE DEEPLABV3 MODEL')
     model = deeplabv3_plus((H, W, 3))
+
+    print('COMPILE THE DEEPLAB V3 MODEL')
     model.compile(loss=dice_loss, optimizer=tf.keras.optimizers.Adam(learning_rate), metrics=[dice_coef, iou, tf.keras.metrics.Recall(), tf.keras.metrics.Precision()])
 
     
     model_path = str(model_path.resolve())
     csv_path = str(csv_path.resolve())
     
+    print('PATH WHERE THE MODEL IS SAVED : ', model_path)
+    print('PATH WHERE THE CSV IS SAVED : ', csv_path)
 
     callbacks = [
         tf.keras.callbacks.ModelCheckpoint(model_path, verbose=1, save_best_only=True),
@@ -93,4 +106,9 @@ if __name__ == "__main__":
         tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=20, restore_best_weights=False)
     ]
 
+    print('REGISTERED ALL THE CALLBACKS ')
+
+    print('ALL DONE GO AHEAD AND FIT THE MODEL')
+    print('TRAINING STARTS ......')
     model.fit(train_dataset, epochs=epochs_to_train, validation_data=test_dataset, callbacks=callbacks)
+    print('TRAINING ENDED......')
