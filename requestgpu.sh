@@ -9,5 +9,4 @@ module restore tensorenvironment
 SOURCEDIR=~/scratch/HumanSegmentation
 # Prepare virtualenv
 source ~/Workspace/TensorFlowEnvironment/bin/activate
-
-python $SOURCEDIR/train.py
+tensorboard --logdir=./logs --host 0.0.0.0 --load_fast false & python $SOURCEDIR/train.py
