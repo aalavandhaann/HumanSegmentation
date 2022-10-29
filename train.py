@@ -54,7 +54,7 @@ if __name__ == "__main__":
     tf.random.set_seed(42)
 
     ''' Directory for storing the training output '''
-    save_training_path = pathlib.Path('./files')
+    save_training_path = pathlib.Path('./trained_model')
     save_training_path.mkdir(parents=True, exist_ok=True)
 
 
@@ -99,11 +99,11 @@ if __name__ == "__main__":
     print('PATH WHERE THE CSV IS SAVED : ', csv_path)
 
     callbacks = [
-        tf.keras.callbacks.ModelCheckpoint(model_path, verbose=1, save_best_only=True),
+        tf.keras.callbacks.ModelCheckpoint(model_path, verbose=1, save_weights_only=True),
         tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=5, min_lr=1e-7, verbose=1),
         tf.keras.callbacks.CSVLogger(csv_path),
         tf.keras.callbacks.TensorBoard(),
-        tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=20, restore_best_weights=False)
+        tf.keras.callbacks.EarlyStopping(monitor='loss', patience=20, restore_best_weights=False)
     ]
 
     print('REGISTERED ALL THE CALLBACKS ')
@@ -111,4 +111,5 @@ if __name__ == "__main__":
     print('ALL DONE GO AHEAD AND FIT THE MODEL')
     print('TRAINING STARTS ......')
     model.fit(train_dataset, epochs=epochs_to_train, validation_data=test_dataset, callbacks=callbacks)
+    model.save(model_path)
     print('TRAINING ENDED......')
