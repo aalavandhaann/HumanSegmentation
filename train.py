@@ -89,7 +89,7 @@ if __name__ == "__main__":
     model = deeplabv3_plus((H, W, 3))
 
     print('COMPILE THE DEEPLAB V3 MODEL')
-    model.compile(loss=dice_loss, optimizer=tf.keras.optimizers.Adam(learning_rate), metrics=[dice_coef, iou, tf.keras.metrics.Recall(), tf.keras.metrics.Precision()])
+    model.compile(loss=dice_loss, run_eagerly=True, optimizer=tf.keras.optimizers.Adam(learning_rate), metrics=[dice_coef, iou, tf.keras.metrics.Recall(), tf.keras.metrics.Precision()])
 
     
     model_path = str(model_path.resolve())
