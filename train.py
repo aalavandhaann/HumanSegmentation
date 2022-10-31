@@ -1,5 +1,6 @@
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = "2"
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 import pathlib
 
 import numpy as np
@@ -62,8 +63,13 @@ if __name__ == "__main__":
     batch_size = 8
     learning_rate = 1e-4
     epochs_to_train = 20
+<<<<<<< HEAD
     model_path = pathlib.Path(os.path.join(save_training_path, "model-graham.h5"))
     csv_path = pathlib.Path(os.path.join(save_training_path, "data-graham.csv"))
+=======
+    model_path = pathlib.Path(os.path.join(save_training_path, "model-cedar.h5"))
+    csv_path = pathlib.Path(os.path.join(save_training_path, "data.csv"))
+>>>>>>> 9bb0cf6f1d6f9b1e46f61e13c6d661435732d25a
 
     """ Dataset """
     dataset_path = pathlib.Path('./model_data')
@@ -89,7 +95,7 @@ if __name__ == "__main__":
     model = deeplabv3_plus((H, W, 3))
 
     print('COMPILE THE DEEPLAB V3 MODEL')
-    model.compile(loss=dice_loss, optimizer=tf.keras.optimizers.Adam(learning_rate), metrics=[dice_coef, iou, tf.keras.metrics.Recall(), tf.keras.metrics.Precision()])
+    model.compile(loss=dice_loss, run_eagerly=True, optimizer=tf.keras.optimizers.Adam(learning_rate), metrics=[dice_coef, iou, tf.keras.metrics.Recall(), tf.keras.metrics.Precision()])
 
     
     model_path = str(model_path.resolve())
@@ -107,6 +113,12 @@ if __name__ == "__main__":
     ]
 
     print('REGISTERED ALL THE CALLBACKS ')
+
+    if(model_path.is_file()):
+        model.load_weights(model_path)
+        # Re-evaluate the model
+        loss, acc = model.evaluate(test_dataset, verbose=2)
+        print("Restored model, accuracy: {:5.2f}%".format(100 * acc))
 
     print('ALL DONE GO AHEAD AND FIT THE MODEL')
     print('TRAINING STARTS ......')
