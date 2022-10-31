@@ -99,7 +99,7 @@ if __name__ == "__main__":
     print('PATH WHERE THE CSV IS SAVED : ', csv_path)
 
     callbacks = [
-        tf.keras.callbacks.ModelCheckpoint(model_path, verbose=1, save_weights_only=True),
+        tf.keras.callbacks.ModelCheckpoint(model_path, verbose=1, save_weights_only=True, save_freq='epoch'),
         tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=5, min_lr=1e-7, verbose=1),
         tf.keras.callbacks.CSVLogger(csv_path),
         tf.keras.callbacks.TensorBoard(),
