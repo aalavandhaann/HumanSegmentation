@@ -19,7 +19,7 @@ if __name__ == "__main__":
     np.random.seed(42)
     tf.random.set_seed(42)
 
-    results = pathlib.Path("./files/")
+    results = pathlib.Path("./trained_model/")
     results.mkdir(parents=True, exist_ok=True)
 
     """ Load the trained model """

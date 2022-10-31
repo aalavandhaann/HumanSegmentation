@@ -62,8 +62,8 @@ if __name__ == "__main__":
     batch_size = 8
     learning_rate = 1e-4
     epochs_to_train = 20
-    model_path = pathlib.Path(os.path.join(save_training_path, "model.h5"))
-    csv_path = pathlib.Path(os.path.join(save_training_path, "data.csv"))
+    model_path = pathlib.Path(os.path.join(save_training_path, "model-graham.h5"))
+    csv_path = pathlib.Path(os.path.join(save_training_path, "data-graham.csv"))
 
     """ Dataset """
     dataset_path = pathlib.Path('./model_data')

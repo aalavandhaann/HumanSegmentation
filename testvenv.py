@@ -8,7 +8,7 @@ import cv2
 import albumentations
 
 import tensorflow as tf
-
+print(tf.config.list_physical_devices('GPU'))
 
 from model import deeplabv3_plus
 from dataprocessing import load_data
@@ -30,7 +30,7 @@ if __name__ == "__main__":
     save_training_path.mkdir(parents=True, exist_ok=True)
 
     """ Hyperparameters """
-    batch_size = 8
+    batch_size = 2
     learning_rate = 1e-4
     epochs_to_train = 20
     model_path = pathlib.Path(os.path.join(save_training_path, "model-graham.h5"))
@@ -62,7 +62,9 @@ if __name__ == "__main__":
     print('COMPILE THE DEEPLAB V3 MODEL')
     model.compile(loss=dice_loss, optimizer=tf.keras.optimizers.Adam(learning_rate), metrics=[dice_coef, iou, tf.keras.metrics.Recall(), tf.keras.metrics.Precision()])
 
+    print('PRELOAD WEIGHTS')
     model.load_weights(model_path)
+    print('REEVALUATE THE MODEL')
     # Re-evaluate the model
     loss, acc = model.evaluate(test_dataset, verbose=2)
     print("Restored model, accuracy: {:5.2f}%".format(100 * acc))
