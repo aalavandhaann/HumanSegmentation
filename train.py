@@ -1,5 +1,6 @@
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = "2"
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 import pathlib
 
 import numpy as np
@@ -62,7 +63,7 @@ if __name__ == "__main__":
     batch_size = 8
     learning_rate = 1e-4
     epochs_to_train = 20
-    model_path = pathlib.Path(os.path.join(save_training_path, "model.h5"))
+    model_path = pathlib.Path(os.path.join(save_training_path, "model-cedar.h5"))
     csv_path = pathlib.Path(os.path.join(save_training_path, "data.csv"))
 
     """ Dataset """
@@ -107,6 +108,12 @@ if __name__ == "__main__":
     ]
 
     print('REGISTERED ALL THE CALLBACKS ')
+
+    if(model_path.is_file()):
+        model.load_weights(model_path)
+        # Re-evaluate the model
+        loss, acc = model.evaluate(test_dataset, verbose=2)
+        print("Restored model, accuracy: {:5.2f}%".format(100 * acc))
 
     print('ALL DONE GO AHEAD AND FIT THE MODEL')
     print('TRAINING STARTS ......')
