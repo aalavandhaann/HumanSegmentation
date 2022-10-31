@@ -1,3 +1,4 @@
+trained_model/checkpoints
 /predictions
 #/trained_model
 /*.out

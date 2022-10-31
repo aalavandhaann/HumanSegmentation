@@ -33,7 +33,7 @@ if __name__ == "__main__":
     batch_size = 2
     learning_rate = 1e-4
     epochs_to_train = 20
-    model_path = pathlib.Path(os.path.join(save_training_path, "model-cedar.h5"))
+    model_path = pathlib.Path(os.path.join(save_training_path, "model.h5"))
     csv_path = pathlib.Path(os.path.join(save_training_path, "data.csv"))
 
     """ Dataset """
@@ -59,8 +59,8 @@ if __name__ == "__main__":
     print('INITIALIZE THE DEEPLABV3 MODEL')
     model = deeplabv3_plus((H, W, 3))
 
-    print('COMPILE THE DEEPLAB V3 MODEL')
-    model.compile(loss=dice_loss, optimizer=tf.keras.optimizers.Adam(learning_rate), metrics=[dice_coef, iou, tf.keras.metrics.Recall(), tf.keras.metrics.Precision()])
+    # print('COMPILE THE DEEPLAB V3 MODEL')
+    # model.compile(loss=dice_loss, optimizer=tf.keras.optimizers.Adam(learning_rate), metrics=[dice_coef, iou, tf.keras.metrics.Recall(), tf.keras.metrics.Precision()])
 
     print('PRELOAD WEIGHTS')
     model.load_weights(model_path)

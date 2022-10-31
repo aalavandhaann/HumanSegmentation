@@ -63,8 +63,12 @@ if __name__ == "__main__":
     batch_size = 8
     learning_rate = 1e-4
     epochs_to_train = 20
-    model_path = pathlib.Path(os.path.join(save_training_path, "model-cedar.h5"))
+    model_path = pathlib.Path(os.path.join(save_training_path, "model.h5"))
     csv_path = pathlib.Path(os.path.join(save_training_path, "data.csv"))
+
+    checkpoint_path = pathlib.Path('./trained_model/checkpoints/cp-{epoch:04d}.ckpt')
+    checkpoint_path.parents[0].mkdir(parents=True, exist_ok=True)
+    checkpoint_dir = checkpoint_path.parents[0]
 
     """ Dataset """
     dataset_path = pathlib.Path('./model_data')
@@ -89,18 +93,21 @@ if __name__ == "__main__":
     print('INITIALIZE THE DEEPLABV3 MODEL')
     model = deeplabv3_plus((H, W, 3))
 
+    """ Save the weights using the 'checkpoint_path' format """
+    model.save_weights(f"{checkpoint_path}".format(epoch=0))
+
     print('COMPILE THE DEEPLAB V3 MODEL')
     model.compile(loss=dice_loss, run_eagerly=True, optimizer=tf.keras.optimizers.Adam(learning_rate), metrics=[dice_coef, iou, tf.keras.metrics.Recall(), tf.keras.metrics.Precision()])
 
     
-    model_path = str(model_path.resolve())
+    # model_path = str(model_path.resolve())
     csv_path = str(csv_path.resolve())
     
-    print('PATH WHERE THE MODEL IS SAVED : ', model_path)
+    # print('PATH WHERE THE MODEL IS SAVED : ', model_path)
     print('PATH WHERE THE CSV IS SAVED : ', csv_path)
 
     callbacks = [
-        tf.keras.callbacks.ModelCheckpoint(model_path, verbose=1, save_weights_only=True, save_freq='epoch'),
+        tf.keras.callbacks.ModelCheckpoint(filepath=f"{checkpoint_path}", verbose=1, save_weights_only=True, save_freq=10*batch_size),
         tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=5, min_lr=1e-7, verbose=1),
         tf.keras.callbacks.CSVLogger(csv_path),
         tf.keras.callbacks.TensorBoard(),
@@ -118,5 +125,5 @@ if __name__ == "__main__":
     print('ALL DONE GO AHEAD AND FIT THE MODEL')
     print('TRAINING STARTS ......')
     model.fit(train_dataset, epochs=epochs_to_train, validation_data=test_dataset, callbacks=callbacks)
-    model.save(model_path)
+    # model.save(model_path)
     print('TRAINING ENDED......')
