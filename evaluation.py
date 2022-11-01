@@ -19,7 +19,19 @@ def save_prediction(original_image, ground_truth_mask, predicted_mask, save_as_p
     """ A GRAY LINE TO SEPARATE BETWEEN THE RESULTS """
     separator_line = np.ones((H, 10, 3)) * 128
 
-    """ The ground_truth_mask is always a single channel grayscale, so need to convert to 3 channel """
+    """ The ground_truth_mask is a grayscale image with shape H x W and each cell refers to a scalar value """
+    """ Hence we need to expand the dimension by 1 to hold the integer value for either 0 or 255 """
+    """ So we need to add an additional dimension such that the shape becomes H x W x 1"""
+    """ 
+        Infact we can also use H x W without expading the dimensions but to keep an uniform shape that conforms
+        to a tensor which always is H x W x (number of channels), we need to expand the dimension by the necessary 
+        number of channels. For example opencv when imread a color image will give you H x W x 3; when imread a 
+        RGBA image will give you H x W x 4; with a grayscale image it doesn't have an extra dimension apart from 
+        the height(H) and width (W), why? Because you don't need an additional list in each pixel of the image because 
+        they are going to hold only a single value from 0 to 255 (from black to white)
+        But a tensor even if it is a grayscale image will always be H x W x 1 instead of just H x W
+    
+    """
     mask = np.expand_dims(ground_truth_mask*255, axis = -1)
     mask = np.concatenate([mask, mask, mask], axis=-1)
 
