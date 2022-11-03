@@ -55,6 +55,20 @@ def augment_data(images_path_collection: list, masks_path_collection: list, save
 
     for image_path, mask_path in tqdm(zip(images_path_collection, masks_path_collection), total=total_images):
 
+        no_of_existing_images = 1
+        if(augment):
+            no_of_existing_images = 5
+
+        all_exists = True
+        for im_index in range(5):
+            image_save_path = pathlib.Path.joinpath(save_image_path, f"{image_path.stem}-{im_index}.png")
+            mask_save_path = pathlib.Path.joinpath(save_masks_path, f"{mask_path.stem}-{im_index}.png")
+            all_exists = all_exists & image_save_path.exists() & mask_save_path.exists()
+
+        if(all_exists):
+            # print('THIS IMAGE HAS BEEN PROCESSED ALREADY, SO CONTINUE')
+            continue
+
         cv_image = cv2.imread(f"{image_path.resolve()}", cv2.IMREAD_COLOR)
         cv_mask = cv2.imread(f"{mask_path.resolve()}", cv2.IMREAD_COLOR)
 
