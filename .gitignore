@@ -1,8 +1,9 @@
 trained_model/logs/*
-trained_model/logs**/**
+/logs*
 trained_model/checkpoints
 trained_model/checkpoints*
 /predictions
+/predictions*
 #/trained_model
 /*.out
 /README.pdf

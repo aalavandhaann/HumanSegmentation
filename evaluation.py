@@ -11,6 +11,7 @@ import tensorflow as tf
 
 from dataprocessing import load_data
 from model import deeplabv3_plus
+from train import tf_dataset
 from metrics import dice_coef, iou, dice_coef, dice_loss
 
 W, H = 512, 512
@@ -46,7 +47,7 @@ def save_prediction(original_image, ground_truth_mask, predicted_mask, save_as_p
 if __name__ == "__main__":
     """ Seeding the environment """
     np.random.seed(42)
-    tf.random.set_seed(42)
+    tf.random.set_seed(42)    
 
     saved_weights = pathlib.Path("./trained_model/model-graham.h5")
     results = pathlib.Path("./trained_model/model.h5")
@@ -56,25 +57,53 @@ if __name__ == "__main__":
     dataset_path = pathlib.Path('./model_data')
     training_path = pathlib.Path(os.path.join(dataset_path, 'train'))
     testing_path = pathlib.Path(os.path.join(dataset_path, 'test'))
-
-    """ Load the trained model """
-
-    print('INITIALIZE THE DEEPLABV3 MODEL')
-    model = deeplabv3_plus((H, W, 3))
-
-    with tf.keras.utils.CustomObjectScope({'iou': iou, 'dice_coef': dice_coef, 'dice_loss': dice_loss}):
-        model.load_weights(f"{saved_weights.resolve()}")
     
     """ Load the test dataset """
     print("LOAD THE TESTING IMAGES AND MASKS")
     test_images_collection, test_masks_collection = load_data(testing_path, do_splitting=False, ext1='*.png', as_str=False)
     print(f"Test <#images, #masks>: <{len(test_images_collection)}, {len(test_masks_collection)}>")
 
+    
+    """ Hyperparameters """
+    batch_size = 2
+    learning_rate = 1e-4
+
+    # print('CREATE THE TESTING DATASET TENSORS')
+    # test_dataset = tf_dataset(test_images_collection, test_masks_collection, batch = batch_size)
+
+    """ Load the trained model """
+
+    print('INITIALIZE THE DEEPLABV3 MODEL')
+    model = deeplabv3_plus((H, W, 3))
+    
+    # print('COMPILING THE MODEL')
+    # model.compile(loss=dice_loss, optimizer=tf.keras.optimizers.Adam(learning_rate), metrics=[dice_coef, iou, tf.keras.metrics.Recall(), tf.keras.metrics.Precision()])
+
+    # with tf.keras.utils.CustomObjectScope({'iou': iou, 'dice_coef': dice_coef, 'dice_loss': dice_loss}):
+    #     model.load_weights(f"{saved_weights.resolve()}")
+
+    # print('EVALUATE AN UNTRAINED MODEL')
+    # # Evaluate the model
+    # loss, acc = model.evaluate(test_dataset, verbose=2, steps=len(test_dataset))
+    # print("Untrained model, accuracy: {:5.2f}%".format(100 * acc))
+
+    print('LOAD WEIGHTS FROM A CHECKPOINT')
+    checkpoint_path = pathlib.Path('./trained_model/checkpoints-11k')
+    latest = tf.train.latest_checkpoint(checkpoint_path)
+    # Load the previously saved weights
+    model.load_weights(latest)
+
+    # print('EVALUATE THE LOADED MODEL')
+    # # Re-evaluate the model
+    # loss, acc = model.evaluate(test_dataset, verbose=2, steps=len(test_dataset))
+    # print("Restored model, accuracy: {:5.2f}%".format(100 * acc))
+    
+    # raise IndexError
 
 
     """ Prediction of model for segmentation of humans """
 
-    predictions_save_dir = pathlib.Path('./predictions/')
+    predictions_save_dir = pathlib.Path('./predictions-11k/')
     predictions_save_dir.mkdir(parents=True, exist_ok=True)
 
     for image_path, mask_path in tqdm(zip(test_images_collection, test_masks_collection), total=len(test_images_collection)):

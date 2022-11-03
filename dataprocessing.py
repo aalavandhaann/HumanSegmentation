@@ -125,7 +125,7 @@ if __name__ == '__main__':
     np.random.seed(42)
 
     """ Loading the dataset """    
-    train_images, test_images, train_masks, test_masks = load_data(data_path, split=0.1)
+    train_images, test_images, train_masks, test_masks = load_data(data_path, split=0.2)
 
     print(f"Train <#images, #masks>: <{len(train_images)}, {len(train_masks)}>")
     print(f"Test <#images, #masks>: <{len(test_images)}, {len(test_masks)}>")
